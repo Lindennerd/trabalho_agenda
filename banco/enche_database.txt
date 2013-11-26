@@ -1,0 +1,4 @@
+INSERT INTO agenda (nome_contato, sobrenome, endereco, telefon, email) VALUES ('aline', 'silva', 'rua a', '123456488', 'aline@hotmail.com');
+INSERT INTO agenda  (nome_contato, sobrenome, endereco, telefon, email) VALUES ('luiz', 'lindenmaier', 'rua a', '123456679', 'luiz@hotmail.com');
+INSERT INTO agenda  (nome_contato, sobrenome, endereco, telefon, email) VALUES ('leandro', 'silva', 'rua c', '7894654131', 'lele@hotmail.com');
+INSERT INTO agenda  (nome_contato, sobrenome, endereco, telefon, email) VALUES ('mauricio', 'silva', 'rua silva', '87465165', 'maumau@hotmailm');

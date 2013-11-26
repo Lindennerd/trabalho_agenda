@@ -1,0 +1,8 @@
+create table if not exists agenda
+(
+	nome_contato varchar(255),
+	sobrenome varchar(255),
+	endereco varchar(255),
+	telefon varchar(255),
+	email varchar(255)
+)
