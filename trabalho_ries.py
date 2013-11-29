@@ -2,6 +2,29 @@ import sqlite3
 import settings
 import os
 import smtplib
+import sys
+
+def trata_filtro():
+    opt = raw_input("""
+        Escolha o filtro desejado:
+
+        1 filtro por nome
+        2 por sobrenome
+        3 filtro por endereco
+        4 filtro por email
+
+    """)
+
+    if opt == '1':
+        return listar('nome')
+    elif opt == '2':
+        return listar('sobrenome')
+    elif opt == '3':
+        return listar('endereco')
+    elif opt == '4':
+        return listar('email')
+    else
+        return None
 
 def enviar_email():
     con = sqlite3.connect(os.path.join(settings.local, 'agenda.db'))
@@ -41,31 +64,21 @@ def editar(email):
         exib = cont + '\n' + exib  
     print 'Seu contato: \n' + exib
 
-    opt = raw_input("""
-        Escolha o campo que deseja editar:
-
-        1 nome
-        2 sobrenome
-        3 endereco
-        4 telefone
-        5 email
-
-    """)
     novo_nome = ''
     if opt == '1':
-        novo_nome = raw_input('digite o novo nome')
+        novo_nome = raw_input('digite o novo nome: ')
         c.execute("update agenda set nome_contato = '"+novo_nome+"' where email = '"+email+"'")
     elif opt == '2':
-        novo_nome = raw_input('digite o novo sobrenome')
+        novo_nome = raw_input('digite o novo sobrenome: ')
         c.execute("update agenda set sobrenome = '"+novo_nome+"' where email = '"+email+"'")
     elif opt == '3':
-        novo_nome = raw_input('digite o novo endereco')
+        novo_nome = raw_input('digite o novo endereco: ')
         c.execute("update agenda set endereco = '"+novo_nome+"' where email = '"+email+"'")
     elif opt == '4':
-        novo_nome = raw_input('digite o novo telefone')
+        novo_nome = raw_input('digite o novo telefone: ')
         c.execute("update agenda set telefone = '"+novo_nome+"' where email = '"+email+"'")
     elif opt == '5':
-        novo_nome = raw_input('digite o novo email')
+        novo_nome = raw_input('digite o novo email: ')
         c.execute("update agenda set email = '"+novo_nome+"' where email = '"+email+"'")
     else:
         return 'Opcao Invalida'
@@ -86,11 +99,11 @@ def excluir(email):
     con.close()
 
 def add_contato():
-    nome = raw_input('Nome do contato')
-    sobrenome = raw_input('Sobrenome do contato')
-    endereco = raw_input('endereco do contato')
-    telefone = raw_input('Telefone do contato')
-    email = raw_input('email do contato')
+    nome = raw_input('Nome do contato: ')
+    sobrenome = raw_input('Sobrenome do contato: ')
+    endereco = raw_input('endereco do contato: ')
+    telefone = raw_input('Telefone do contato: ')
+    email = raw_input('email do contato: ')
 
     con = sqlite3.connect(os.path.join(settings.local, 'agenda.db'))
     c = con.cursor()
@@ -104,14 +117,20 @@ def add_contato():
     con.close()
 
 def ler_arquivo(arquivo):
-    op = open(os.path.join(r"E:\trabalho_ries\banco", arquivo), 'rw')
+    folder = os.path.join(os.path.dirname('__file__'), 'banco')
+    op = open(os.path.join(folder, arquivo))
     return op.read().replace(';', '')
 
-def busca_contatos(nome):
+def busca_contatos(filtro):
     con = sqlite3.connect(os.path.join(settings.local, 'agenda.db'))
     c = con.cursor()
-    c.execute(ler_arquivo('busca_contatos.txt'))
-    return c.fetchall()
+
+    if filtro == None:
+        c.execute(ler_arquivo('busca_contatos.txt'))
+    elif filtro == 'nome':
+        pass
+            
+    return c.fetchall()    
     con.close()
     
 def cria_banco():
@@ -123,31 +142,43 @@ def cria_banco():
     
 def listar(filtro):
     cria_banco()
-    contatos = busca_contatos('')
+    contatos = busca_contatos(filtro)
+    
+    if len(contatos) == 0:
+        return 'Nenhum contato encontrado'
+    
     exib = ''
     for contato in contatos:
-        for item in contato:
-            exib = 'email: ' + str(item) + '\n' + exib
-            exib = 'telefone: ' + str(item) + '\n' + exib
-            exib = 'endereco: ' + str(item) + '\n' + exib
-            exib = 'sobrenome: ' + str(item) + '\n' + exib
-            exib = 'nome: ' + str(item) + '\n' + exib
+            exib = 'email: ' + str(contato[4]) + '\n' + exib
+            exib = 'telefone: ' + str(contato[3]) + '\n' + exib
+            exib = 'endereco: ' + str(contato[2]) + '\n' + exib
+            exib = 'sobrenome: ' + str(contato[1]) + '\n' + exib
+            exib = 'nome: ' + str(contato[0]) + '\n' + exib
             exib = '---------------------- ' + '\n' + exib
+    
     return exib
 
 
 def trata_escolha(opt):
     if opt == '1':
+        os.system('cls')
+        filt = raw_input('filtrar listagem?(s/n)')
+        if filt == 's':
+            return trata_filtro()
         return listar('')
     elif opt == '2':
+        os.system('cls')
         return add_contato()
     elif opt == '3':
-        email = raw_input('digite o email do contato a excluir')
+        os.system('cls')
+        email = raw_input('digite o email do contato a excluir: ')
         return excluir(email)
     elif opt == '4':
-        email = raw_input('digite o email do contato a editar')
+        os.system('cls')
+        email = raw_input('digite o email do contato a editar: ')
         return editar(email)
     elif opt == '5':
+        os.system('cls')
         return enviar_email()
     else:
         return 'sair'
@@ -169,4 +200,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    opt = ''
+    while opt != 'sair':
+        print main()
