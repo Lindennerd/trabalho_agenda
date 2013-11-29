@@ -16,14 +16,14 @@ def trata_filtro():
     """)
 
     if opt == '1':
-        return listar('nome')
+        return listar('nome_contato', raw_input('digite o nome para filtrar: '))
     elif opt == '2':
-        return listar('sobrenome')
+        return listar('sobrenome', raw_input('digite o sobrenome para filtrar: '))
     elif opt == '3':
-        return listar('endereco')
+        return listar('endereco', raw_input('digite o endereco para filtrar: '))
     elif opt == '4':
-        return listar('email')
-    else
+        return listar('email' , raw_input('digite o dominio para filtrar: '))
+    else:
         return None
 
 def enviar_email():
@@ -120,18 +120,6 @@ def ler_arquivo(arquivo):
     folder = os.path.join(os.path.dirname('__file__'), 'banco')
     op = open(os.path.join(folder, arquivo))
     return op.read().replace(';', '')
-
-def busca_contatos(filtro):
-    con = sqlite3.connect(os.path.join(settings.local, 'agenda.db'))
-    c = con.cursor()
-
-    if filtro == None:
-        c.execute(ler_arquivo('busca_contatos.txt'))
-    elif filtro == 'nome':
-        pass
-            
-    return c.fetchall()    
-    con.close()
     
 def cria_banco():
     con = sqlite3.connect(os.path.join(settings.local, 'agenda.db'))
@@ -139,10 +127,27 @@ def cria_banco():
     c.execute(ler_arquivo('create_database.txt'))
     con.commit()
     con.close()
+
+def busca_contatos(campo=None, dado=None):
+    con = sqlite3.connect(os.path.join(settings.local, 'agenda.db'))
+    c = con.cursor()
+
+    if campo == dado == None:
+        c.execute(ler_arquivo('busca_contatos.txt'))
+    elif campo == 'email':
+        dominio = str(dado).split('@')[1]
+        query = 'select * from agenda where ' + campo + ' like \'%'+dominio+'%\''
+        c.execute(query)
+    else:
+        query = 'select * from agenda where ' + campo + ' like \'%'+dado+'%\''
+        c.execute(query)
+            
+    return c.fetchall()    
+    con.close()
     
-def listar(filtro):
+def listar(campo=None, dado=None):
     cria_banco()
-    contatos = busca_contatos(filtro)
+    contatos = busca_contatos(campo, dado)
     
     if len(contatos) == 0:
         return 'Nenhum contato encontrado'
@@ -165,7 +170,7 @@ def trata_escolha(opt):
         filt = raw_input('filtrar listagem?(s/n)')
         if filt == 's':
             return trata_filtro()
-        return listar('')
+        return listar()
     elif opt == '2':
         os.system('cls')
         return add_contato()
